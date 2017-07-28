@@ -3,6 +3,33 @@
 using std::string;
 using boost::optional;
 
+enum class IpaPhone {
+	p,
+	\u0061\u028a\u032f // aʊ̯
+};
+
+constexpr bool equal(char const * a, char const * b) {
+	return *a == *b && (*a == '\0' || equal(a + 1, b + 1));
+}
+
+constexpr IpaPhone operator "" _phone(const char* s) {
+	return equal(s, u8"p") ? IpaPhone::p
+		: equal(s, u8"aʊ̯") ? IpaPhone::\u0061\u028a\u032f
+		: throw std::logic_error("Unknown IPA phone.");
+}
+
+constexpr IpaPhone _phone(const char* s) {
+	return equal(s, u8"p") ? IpaPhone::p
+		: equal(s, u8"aʊ̯") ? IpaPhone::\u0061\u028a\u032f
+		: throw std::logic_error("Unknown IPA phone.");
+}
+
+void foo() {
+	//IpaPhone phone = u8"aʊ̯"_phone;
+	constexpr IpaPhone phone1 = _phone(u8"aʊ̯");
+	constexpr IpaPhone phone2 = IpaPhone::\u0061\u028a\u032f;
+}
+
 PhoneConverter& PhoneConverter::get() {
 	static PhoneConverter converter;
 	return converter;
