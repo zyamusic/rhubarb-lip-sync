@@ -595,6 +595,13 @@ function createDialogWindow() {
 			}
 		}
 
+		// Check super mouth
+		var superComp = controls.superMouthComp.selection.projectItem;
+
+		if(superComp.frameRate * superComp.duration <= 216){
+			return 'The super mouth comp should contains at least 217 frames';
+		}
+
 		// Check for correct Rhubarb version
 		var version = exec(rhubarbPath + ' --version') || '';
 		var match = version.match(/Rhubarb Lip Sync version ((\d+)\.(\d+).(\d+))/);
@@ -728,12 +735,21 @@ function createDialogWindow() {
 
 			var startLipFrame = 0;
 			var endLipFrame = 0;
+			var transFrame = 6;
 			if(lipsync[prev.value + '_' + curr.value]){
 				startLipFrame = lipsync[prev.value + '_' + curr.value].start;
 				endLipFrame = lipsync[prev.value + '_' + curr.value].end;
+				transFrame = endLipFrame - startLipFrame;
 			}else{
 				startLipFrame = lipsync[curr.value + '_' + prev.value].end;
 				endLipFrame = lipsync[curr.value + '_' + prev.value].start;
+				transFrame = startLipFrame - endLipFrame;
+			}
+
+			if(transFrame < 0){
+				transFrame = -transFrame;
+			}else if(transFrame == 0){
+				transFrame = 6;
 			}
 
 			var startLipTime = startLipFrame !== 0 ? frameToTime(startLipFrame, superMouthComp) : 0;
@@ -753,8 +769,8 @@ function createDialogWindow() {
 				superTimeRemap.setValueAtTime(prevTime, startLipTime);
 			}
 
-			if(prevFrame < currFrame - 6){
-				prevFrame = currFrame - 6;
+			if(prevFrame < currFrame - transFrame){
+				prevFrame = currFrame - transFrame;
 				prevTime = prevFrame !== 0 ? frameToTime(prevFrame - epsilon, comp) : 0;
 				superTimeRemap.setValueAtTime(prevTime, startLipTime);
 			}
