@@ -719,6 +719,7 @@ function createDialogWindow() {
 		superMouthLayer.outPoint = comp.duration;
 
 		var superTimeRemap = superMouthLayer['Time Remap'];
+		//superTimeRemap.removeKey(1);
 		superTimeRemap.removeKey(2);
 
 		for(var i = 1; i < mouthCues.mouthCues.length; i++){
@@ -744,6 +745,10 @@ function createDialogWindow() {
 			var currFrame = Math.floor(timeToFrame(curr.start, comp));
 			var currTime = currFrame !== 0 ? frameToTime(currFrame - epsilon, comp) : 0;
 
+			if(i == 1){
+				superTimeRemap.setValueAtTime(0, startLipTime);
+			}
+
 			if(prevFrame < currFrame){
 				superTimeRemap.setValueAtTime(prevTime, startLipTime);
 			}
@@ -754,7 +759,7 @@ function createDialogWindow() {
 				superTimeRemap.setValueAtTime(prevTime, startLipTime);
 			}
 
-			superTimeRemap.setValueAtTime(prevTime, startLipTime);
+			//superTimeRemap.setValueAtTime(prevTime, startLipTime);
 			superTimeRemap.setValueAtTime(currTime, endLipTime);
 		}
 	}
