@@ -34,6 +34,45 @@ String.prototype.trim||(String.prototype.trim=function(){return this.replace(/^[
 // Polyfill for JSON
 "object"!=typeof JSON&&(JSON={}),function(){"use strict";function f(a){return a<10?"0"+a:a}function this_value(){return this.valueOf()}function quote(a){return rx_escapable.lastIndex=0,rx_escapable.test(a)?'"'+a.replace(rx_escapable,function(a){var b=meta[a];return"string"==typeof b?b:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+a+'"'}function str(a,b){var c,d,e,f,h,g=gap,i=b[a];switch(i&&"object"==typeof i&&"function"==typeof i.toJSON&&(i=i.toJSON(a)),"function"==typeof rep&&(i=rep.call(b,a,i)),typeof i){case"string":return quote(i);case"number":return isFinite(i)?String(i):"null";case"boolean":case"null":return String(i);case"object":if(!i)return"null";if(gap+=indent,h=[],"[object Array]"===Object.prototype.toString.apply(i)){for(f=i.length,c=0;c<f;c+=1)h[c]=str(c,i)||"null";return e=0===h.length?"[]":gap?"[\n"+gap+h.join(",\n"+gap)+"\n"+g+"]":"["+h.join(",")+"]",gap=g,e}if(rep&&"object"==typeof rep)for(f=rep.length,c=0;c<f;c+=1)"string"==typeof rep[c]&&(d=rep[c],(e=str(d,i))&&h.push(quote(d)+(gap?": ":":")+e));else for(d in i)Object.prototype.hasOwnProperty.call(i,d)&&(e=str(d,i))&&h.push(quote(d)+(gap?": ":":")+e);return e=0===h.length?"{}":gap?"{\n"+gap+h.join(",\n"+gap)+"\n"+g+"}":"{"+h.join(",")+"}",gap=g,e}}var rx_one=/^[\],:{}\s]*$/,rx_two=/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,rx_three=/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,rx_four=/(?:^|:|,)(?:\s*\[)+/g,rx_escapable=/[\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,rx_dangerous=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;"function"!=typeof Date.prototype.toJSON&&(Date.prototype.toJSON=function(){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z":null},Boolean.prototype.toJSON=this_value,Number.prototype.toJSON=this_value,String.prototype.toJSON=this_value);var gap,indent,meta,rep;"function"!=typeof JSON.stringify&&(meta={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},JSON.stringify=function(a,b,c){var d;if(gap="",indent="","number"==typeof c)for(d=0;d<c;d+=1)indent+=" ";else"string"==typeof c&&(indent=c);if(rep=b,b&&"function"!=typeof b&&("object"!=typeof b||"number"!=typeof b.length))throw new Error("JSON.stringify");return str("",{"":a})}),"function"!=typeof JSON.parse&&(JSON.parse=function(text,reviver){function walk(a,b){var c,d,e=a[b];if(e&&"object"==typeof e)for(c in e)Object.prototype.hasOwnProperty.call(e,c)&&(d=walk(e,c),void 0!==d?e[c]=d:delete e[c]);return reviver.call(a,b,e)}var j;if(text=String(text),rx_dangerous.lastIndex=0,rx_dangerous.test(text)&&(text=text.replace(rx_dangerous,function(a){return"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})),rx_one.test(text.replace(rx_two,"@").replace(rx_three,"]").replace(rx_four,"")))return j=eval("("+text+")"),"function"==typeof reviver?walk({"":j},""):j;throw new SyntaxError("JSON.parse")})}();
 
+var lipsync = { 
+  X_A: { start: 0, end: 6, transition: 'X_A' },
+  A_D: { start: 6, end: 12, transition: 'A_D' },
+  D_C: { start: 12, end: 18, transition: 'D_C' },
+  C_E: { start: 18, end: 24, transition: 'C_E' },
+  E_F: { start: 24, end: 30, transition: 'E_F' },
+  F_G: { start: 30, end: 36, transition: 'F_G' },
+  G_H: { start: 36, end: 42, transition: 'G_H' },
+  H_X: { start: 42, end: 48, transition: 'H_X' },
+  X_B: { start: 48, end: 54, transition: 'X_B' },
+  B_D: { start: 54, end: 60, transition: 'B_D' },
+  D_F: { start: 60, end: 66, transition: 'D_F' },
+  F_H: { start: 66, end: 72, transition: 'F_H' },
+  H_A: { start: 72, end: 78, transition: 'H_A' },
+  A_B: { start: 78, end: 84, transition: 'A_B' },
+  B_C: { start: 84, end: 90, transition: 'B_C' },
+  C_G: { start: 90, end: 96, transition: 'C_G' },
+  G_B: { start: 96, end: 102, transition: 'G_B' },
+  B_F: { start: 102, end: 108, transition: 'B_F' },
+  F_A: { start: 108, end: 114, transition: 'F_A' },
+  A_E: { start: 114, end: 120, transition: 'A_E' },
+  E_X: { start: 120, end: 126, transition: 'E_X' },
+  X_D: { start: 126, end: 132, transition: 'X_D' },
+  D_G: { start: 132, end: 138, transition: 'D_G' },
+  G_A: { start: 138, end: 144, transition: 'G_A' },
+  A_C: { start: 144, end: 150, transition: 'A_C' },
+  C_H: { start: 150, end: 156, transition: 'C_H' },
+  H_E: { start: 156, end: 162, transition: 'H_E' },
+  E_B: { start: 162, end: 168, transition: 'E_B' },
+  B_H: { start: 168, end: 174, transition: 'B_H' },
+  H_D: { start: 174, end: 180, transition: 'H_D' },
+  D_E: { start: 180, end: 186, transition: 'D_E' },
+  E_G: { start: 186, end: 192, transition: 'E_G' },
+  G_X: { start: 192, end: 198, transition: 'G_X' },
+  X_C: { start: 198, end: 204, transition: 'X_C' },
+  C_F: { start: 204, end: 210, transition: 'C_F' },
+  F_X: { start: 210, end: 216, transition: 'F_X' } };
+
+
 function last(array) {
 	return array[array.length - 1];
 }
@@ -346,6 +385,10 @@ function createDialogWindow() {
 							createExtendedShapeCheckboxes()
 						)
 					),
+					superMouthComp: Group({
+						label: StaticText({ text: 'Super Mouth composition:' }),
+						value: DropDownList({ helpTip: getMouthCompHelpTip() })
+					}),
 					targetFolder: Group({
 						label: StaticText({ text: 'Target folder:' }),
 						value: DropDownList({
@@ -388,6 +431,7 @@ function createDialogWindow() {
 		audioFile: window.settings.audioFile.value,
 		dialogText: window.settings.dialogText.value,
 		mouthComp: window.settings.mouthComp.value,
+		superMouthComp: window.settings.superMouthComp.value,
 		targetFolder: window.settings.targetFolder.value,
 		frameRate: window.settings.frameRate.value,
 		autoFrameRate: window.settings.frameRate.auto,
@@ -412,6 +456,9 @@ function createDialogWindow() {
 	comps.forEach(function(projectItem) {
 		var listItem = controls.mouthComp.add('item', getItemPath(projectItem));
 		listItem.projectItem = projectItem;
+
+		var superListItem = controls.superMouthComp.add('item', getItemPath(projectItem));
+		superListItem.projectItem = projectItem;
 	});
 
 	// Add target folder options
@@ -429,6 +476,8 @@ function createDialogWindow() {
 	selectByTextOrFirst(controls.audioFile, settings.audioFile);
 	controls.dialogText.text = settings.dialogText || '';
 	selectByTextOrFirst(controls.mouthComp, settings.mouthComp);
+	selectByTextOrFirst(controls.superMouthComp, settings.superMouthComp);
+
 	extendedMouthShapeNames.forEach(function(shapeName) {
 		controls['mouthShape' + shapeName].value =
 			(settings.extendedMouthShapes || {})[shapeName.toLowerCase()];
@@ -490,6 +539,7 @@ function createDialogWindow() {
 				dialogText: controls.dialogText.text,
 				mouthComp: (controls.mouthComp.selection || {}).text,
 				extendedMouthShapes: {},
+				superMouthComp: (controls.superMouthComp.selection || {}).text,
 				targetFolder: (controls.targetFolder.selection || {}).text,
 				frameRate: Number(controls.frameRate.text),
 				autoFrameRate: controls.autoFrameRate.value
@@ -512,6 +562,7 @@ function createDialogWindow() {
 		// Check input values
 		if (!controls.audioFile.selection) return 'Please select an audio file.';
 		if (!controls.mouthComp.selection) return 'Please select a mouth composition.';
+		if (!controls.superMouthComp.selection) return 'Please select a super mouth composition.';
 		if (!controls.targetFolder.selection) return 'Please select a target folder.';
 		if (Number(controls.frameRate.text) < 12) {
 			return 'Please enter a frame rate of at least 12 fps.';
@@ -614,7 +665,7 @@ function createDialogWindow() {
 		}
 	}
 
-	function animateMouthCues(mouthCues, audioFileFootage, mouthComp, targetProjectFolder,
+	function animateMouthCues(mouthCues, audioFileFootage, mouthComp, superMouthComp,targetProjectFolder,
 		frameRate)
 	{
 		// Find an unconflicting comp name
@@ -661,9 +712,54 @@ function createDialogWindow() {
 		for (var i = 1; i <= timeRemap.numKeys; i++) {
 			timeRemap.setInterpolationTypeAtKey(i, KeyframeInterpolationType.HOLD);
 		}
+
+		// Add super mouth layer
+		var superMouthLayer = comp.layers.add(superMouthComp);
+		superMouthLayer.timeRemapEnabled = true;
+		superMouthLayer.outPoint = comp.duration;
+
+		var superTimeRemap = superMouthLayer['Time Remap'];
+		superTimeRemap.removeKey(2);
+
+		for(var i = 1; i < mouthCues.mouthCues.length; i++){
+			var prev = mouthCues.mouthCues[i-1];
+			var curr = mouthCues.mouthCues[i];
+
+			var startLipFrame = 0;
+			var endLipFrame = 0;
+			if(lipsync[prev.value + '_' + curr.value]){
+				startLipFrame = lipsync[prev.value + '_' + curr.value].start;
+				endLipFrame = lipsync[prev.value + '_' + curr.value].end;
+			}else{
+				startLipFrame = lipsync[curr.value + '_' + prev.value].end;
+				endLipFrame = lipsync[curr.value + '_' + prev.value].start;
+			}
+
+			var startLipTime = startLipFrame !== 0 ? frameToTime(startLipFrame, superMouthComp) : 0;
+			var endLipTime = endLipFrame !== 0 ? frameToTime(endLipFrame, superMouthComp) : 0;
+
+			var prevFrame = Math.floor(timeToFrame(prev.start, comp)) + 1;
+			var prevTime = prevFrame !== 0 ? frameToTime(prevFrame - epsilon, comp) : 0;
+
+			var currFrame = Math.floor(timeToFrame(curr.start, comp));
+			var currTime = currFrame !== 0 ? frameToTime(currFrame - epsilon, comp) : 0;
+
+			if(prevFrame < currFrame){
+				superTimeRemap.setValueAtTime(prevTime, startLipTime);
+			}
+
+			if(prevFrame < currFrame - 6){
+				prevFrame = currFrame - 6;
+				prevTime = prevFrame !== 0 ? frameToTime(prevFrame - epsilon, comp) : 0;
+				superTimeRemap.setValueAtTime(prevTime, startLipTime);
+			}
+
+			superTimeRemap.setValueAtTime(prevTime, startLipTime);
+			superTimeRemap.setValueAtTime(currTime, endLipTime);
+		}
 	}
 
-	function animate(audioFileFootage, dialogText, mouthComp, extendedMouthShapeNames,
+	function animate(audioFileFootage, dialogText, mouthComp, superMouthComp,extendedMouthShapeNames,
 		targetProjectFolder, frameRate)
 	{
 		try {
@@ -671,7 +767,7 @@ function createDialogWindow() {
 				extendedMouthShapeNames, targetProjectFolder, frameRate);
 
 			app.beginUndoGroup(appName + ': Animation');
-			animateMouthCues(mouthCues, audioFileFootage, mouthComp, targetProjectFolder,
+			animateMouthCues(mouthCues, audioFileFootage, mouthComp, superMouthComp, targetProjectFolder,
 				frameRate);
 			app.endUndoGroup();
 		} catch (e) {
@@ -705,6 +801,7 @@ function createDialogWindow() {
 				controls.audioFile.selection.projectItem,
 				controls.dialogText.text || '',
 				controls.mouthComp.selection.projectItem,
+				controls.superMouthComp.selection.projectItem,
 				extendedMouthShapeNames.filter(function(shapeName) {
 					return controls['mouthShape' + shapeName].value;
 				}),
