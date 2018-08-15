@@ -145,7 +145,7 @@ function isFrameVisible(compItem, frameNumber) {
 	return Boolean(result);
 }
 
-var appName = 'Rhubarb Lip Sync';
+var appName = 'Zya Lip Sync';
 
 var settingsFilePath = Folder.userData.fullName + '/rhubarb-ae-settings.json';
 
@@ -322,13 +322,8 @@ var mouthShapeCount = mouthShapeNames.length;
 var basicMouthShapeNames = mouthShapeNames.slice(0, basicMouthShapeCount);
 var extendedMouthShapeNames = mouthShapeNames.slice(basicMouthShapeCount);
 
-function getMouthCompHelpTip() {
-	var result = 'A composition containing the mouth shapes, one drawing per frame. They must be '
-		+ 'arranged as follows:\n';
-	mouthShapeNames.forEach(function(mouthShapeName, i) {
-		var isOptional = i >= basicMouthShapeCount;
-		result += '\n00:' + pad(i, 2) + '\t' + mouthShapeName + (isOptional ? ' (optional)' : '');
-	});
+function getSuperMouthCompHelpTip() {
+	var result = 'A composition containing the mouth transitions, should contains at least 217 frames';
 	return result;
 }
 
@@ -375,10 +370,6 @@ function createDialogWindow() {
 								+ 'the recording here. This field is optional.'
 						})
 					}),
-					mouthComp: Group({
-						label: StaticText({ text: 'Mouth composition:' }),
-						value: DropDownList({ helpTip: getMouthCompHelpTip() })
-					}),
 					extendedMouthShapes: Group(
 						Object.assign(
 							{ label: StaticText({ text: 'Extended mouth shapes:' }) },
@@ -387,7 +378,7 @@ function createDialogWindow() {
 					),
 					superMouthComp: Group({
 						label: StaticText({ text: 'Super Mouth composition:' }),
-						value: DropDownList({ helpTip: getMouthCompHelpTip() })
+						value: DropDownList({ helpTip: getSuperMouthCompHelpTip() })
 					}),
 					targetFolder: Group({
 						label: StaticText({ text: 'Target folder:' }),
@@ -430,7 +421,6 @@ function createDialogWindow() {
 	var controls = {
 		audioFile: window.settings.audioFile.value,
 		dialogText: window.settings.dialogText.value,
-		mouthComp: window.settings.mouthComp.value,
 		superMouthComp: window.settings.superMouthComp.value,
 		targetFolder: window.settings.targetFolder.value,
 		frameRate: window.settings.frameRate.value,
@@ -454,9 +444,6 @@ function createDialogWindow() {
 		return item instanceof CompItem;
 	});
 	comps.forEach(function(projectItem) {
-		var listItem = controls.mouthComp.add('item', getItemPath(projectItem));
-		listItem.projectItem = projectItem;
-
 		var superListItem = controls.superMouthComp.add('item', getItemPath(projectItem));
 		superListItem.projectItem = projectItem;
 	});
@@ -475,7 +462,7 @@ function createDialogWindow() {
 	var settings = readSettingsFile();
 	selectByTextOrFirst(controls.audioFile, settings.audioFile);
 	controls.dialogText.text = settings.dialogText || '';
-	selectByTextOrFirst(controls.mouthComp, settings.mouthComp);
+
 	selectByTextOrFirst(controls.superMouthComp, settings.superMouthComp);
 
 	extendedMouthShapeNames.forEach(function(shapeName) {
@@ -523,8 +510,8 @@ function createDialogWindow() {
 			controls.frameRate.enabled = !autoFrameRate;
 			if (autoFrameRate) {
 				// Take frame rate from mouth comp
-				var mouthComp = (controls.mouthComp.selection || {}).projectItem;
-				controls.frameRate.text = mouthComp ? mouthComp.frameRate : '';
+				var superMouthComp = (controls.superMouthComp.selection || {}).projectItem;
+				controls.frameRate.text = superMouthComp ? superMouthComp.frameRate : '';
 			} else {
 				// Sanitize frame rate
 				var sanitizedFrameRate = controls.frameRate.text.match(/\d*\.?\d*/)[0];
@@ -537,7 +524,6 @@ function createDialogWindow() {
 			var settings = {
 				audioFile: (controls.audioFile.selection || {}).text,
 				dialogText: controls.dialogText.text,
-				mouthComp: (controls.mouthComp.selection || {}).text,
 				extendedMouthShapes: {},
 				superMouthComp: (controls.superMouthComp.selection || {}).text,
 				targetFolder: (controls.targetFolder.selection || {}).text,
@@ -561,38 +547,10 @@ function createDialogWindow() {
 	function validate() {
 		// Check input values
 		if (!controls.audioFile.selection) return 'Please select an audio file.';
-		if (!controls.mouthComp.selection) return 'Please select a mouth composition.';
 		if (!controls.superMouthComp.selection) return 'Please select a super mouth composition.';
 		if (!controls.targetFolder.selection) return 'Please select a target folder.';
 		if (Number(controls.frameRate.text) < 12) {
 			return 'Please enter a frame rate of at least 12 fps.';
-		}
-
-		// Check mouth shape visibility
-		var comp = controls.mouthComp.selection.projectItem;
-		for (var i = 0; i < mouthShapeCount; i++) {
-			var shapeName = mouthShapeNames[i];
-			var required = i < basicMouthShapeCount || controls['mouthShape' + shapeName].value;
-			if (required && !isFrameVisible(comp, i)) {
-				return 'The mouth comp does not seem to contain an image for shape '
-					+ shapeName + ' at frame ' + i + '.';
-			}
-		}
-
-		if (!comp.preserveNestedFrameRate) {
-			var fix = Window.confirm(
-				'The setting "Preserve frame rate when nested or in render queue" is not active '
-					+ 'for the mouth composition. This can result in incorrect animation.\n\n'
-					+ 'Activate this setting now?',
-				false,
-				'Fix composition setting?');
-			if (fix) {
-				app.beginUndoGroup(appName + ': Mouth composition setting');
-				comp.preserveNestedFrameRate = true;
-				app.endUndoGroup();
-			} else {
-				return '';
-			}
 		}
 
 		// Check super mouth
@@ -622,7 +580,7 @@ function createDialogWindow() {
 		}
 	}
 
-	function generateMouthCues(audioFileFootage, dialogText, mouthComp, extendedMouthShapeNames,
+	function generateMouthCues(audioFileFootage, dialogText, extendedMouthShapeNames,
 		targetProjectFolder, frameRate)
 	{
 		var basePath = Folder.temp.fsName + '/' + createGuid();
@@ -672,7 +630,7 @@ function createDialogWindow() {
 		}
 	}
 
-	function animateMouthCues(mouthCues, audioFileFootage, mouthComp, superMouthComp,targetProjectFolder,
+	function animateMouthCues(mouthCues, audioFileFootage, superMouthComp,targetProjectFolder,
 		frameRate)
 	{
 		// Find an unconflicting comp name
@@ -688,37 +646,14 @@ function createDialogWindow() {
 		}
 
 		// Create new comp
-		var comp = targetProjectFolder.items.addComp(compName, mouthComp.width, mouthComp.height,
-			mouthComp.pixelAspect, audioFileFootage.duration, frameRate);
+		var comp = targetProjectFolder.items.addComp(compName, superMouthComp.width, superMouthComp.height,
+			superMouthComp.pixelAspect, audioFileFootage.duration, frameRate);
 
 		// Show new comp
 		comp.openInViewer();
 
 		// Add audio layer
 		comp.layers.add(audioFileFootage);
-
-		// Add mouth layer
-		var mouthLayer = comp.layers.add(mouthComp);
-		mouthLayer.timeRemapEnabled = true;
-		mouthLayer.outPoint = comp.duration;
-
-		// Animate mouth layer
-		var timeRemap = mouthLayer['Time Remap'];
-		// Enabling time remapping automatically adds two keys. Remove the second.
-		timeRemap.removeKey(2);
-		mouthCues.mouthCues.forEach(function(mouthCue) {
-			// Round down keyframe time. In animation, earlier is better than later.
-			// Set keyframe time to *just before* the exact frame to prevent rounding errors
-			var frame = Math.floor(timeToFrame(mouthCue.start, comp));
-			var time = frame !== 0 ? frameToTime(frame - epsilon, comp) : 0;
-			// Set remapped time to *just after* the exact frame to prevent rounding errors
-			var mouthCompFrame = mouthShapeNames.indexOf(mouthCue.value);
-			var remappedTime = frameToTime(mouthCompFrame + epsilon, mouthComp);
-			timeRemap.setValueAtTime(time, remappedTime);
-		});
-		for (var i = 1; i <= timeRemap.numKeys; i++) {
-			timeRemap.setInterpolationTypeAtKey(i, KeyframeInterpolationType.HOLD);
-		}
 
 		// Add super mouth layer
 		var superMouthLayer = comp.layers.add(superMouthComp);
@@ -780,15 +715,15 @@ function createDialogWindow() {
 		}
 	}
 
-	function animate(audioFileFootage, dialogText, mouthComp, superMouthComp,extendedMouthShapeNames,
+	function animate(audioFileFootage, dialogText, superMouthComp,extendedMouthShapeNames,
 		targetProjectFolder, frameRate)
 	{
 		try {
-			var mouthCues = generateMouthCues(audioFileFootage, dialogText, mouthComp,
+			var mouthCues = generateMouthCues(audioFileFootage, dialogText,
 				extendedMouthShapeNames, targetProjectFolder, frameRate);
 
 			app.beginUndoGroup(appName + ': Animation');
-			animateMouthCues(mouthCues, audioFileFootage, mouthComp, superMouthComp, targetProjectFolder,
+			animateMouthCues(mouthCues, audioFileFootage, superMouthComp, targetProjectFolder,
 				frameRate);
 			app.endUndoGroup();
 		} catch (e) {
@@ -801,7 +736,7 @@ function createDialogWindow() {
 	update();
 	controls.audioFile.onChange = update;
 	controls.dialogText.onChanging = update;
-	controls.mouthComp.onChange = update;
+	controls.superMouthComp.onChange = update;
 	extendedMouthShapeNames.forEach(function(shapeName) {
 		controls['mouthShape' + shapeName].onClick = update;
 	});
@@ -821,7 +756,6 @@ function createDialogWindow() {
 			animate(
 				controls.audioFile.selection.projectItem,
 				controls.dialogText.text || '',
-				controls.mouthComp.selection.projectItem,
 				controls.superMouthComp.selection.projectItem,
 				extendedMouthShapeNames.filter(function(shapeName) {
 					return controls['mouthShape' + shapeName].value;
